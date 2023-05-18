@@ -1,14 +1,23 @@
-package com.hackerman.p1rralgoritmos;
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package algorr;
 import java.util.Scanner;
+
 /**
  *
- * @author IsraCode
+ * @author Crash
  */
-public class P1RRalgoritmOS {
-    public static void main(String[] args) { 
+public class AlgoRR {
+
+    /**
+     * @param args the command line arguments
+     */
+     public static void main(String[] args) { 
         int ramSize , maxProcesSize, quantumSize, nProcess;
-        Cola colaProcesos = new Cola("Cola de procesos cargados"); //Instancia e inicializa la colaProcesos
+        Cola proces_q = new Cola("Cola de procesos cargados"); //Instancia e inicializa la cola de Procesos
         presentacion();         
         int[] parameters  = definicionParametros();  
         ramSize = parameters[0] ;
@@ -35,19 +44,19 @@ public class P1RRalgoritmOS {
             System.out.println("Se ingresaron los datos correctamente");
             Proceso[] procesosOrdenados = new Proceso[nProcess];
             procesosOrdenados = ordenarProcesos( procesosDesordenados);
-            for (int i = 0; i < nProcess; i++) { //ciclo que llena la colaProcesos con los procesos ordenados
-                colaProcesos.insertar(procesosOrdenados[i]);
+            for (int i = 0; i < nProcess; i++) { //ciclo que llena la cola de Procesos con los procesos ordenados
+            	proces_q.insertar(procesosOrdenados[i]);
             }
             System.out.println("Estos han sido los procesos cargados al sistema:");
-            colaProcesos.imprimirColaCompleta();
+            proces_q.imprimirColaCompleta();
             /**
             Simulador simulador = new Simulador(      ); 
             simulador.iniciar(); 
             */   
-            Cola colaProcesosListos = new Cola("Cola de procesos listos");          
-            AdminProcesosListos llegadaP = new AdminProcesosListos(colaProcesos, colaProcesosListos, ramSize);            
-            Cola colaProcesosTerminados = new Cola("Cola de procesos terminados");
-            Cpu cpu = new Cpu(quantumSize, llegadaP, colaProcesosTerminados);
+            Cola ready_q = new Cola("Cola de procesos listos");          
+            AdminProcesosListos llegadaP = new AdminProcesosListos(proces_q, ready_q, ramSize);            
+            Cola finished_q = new Cola("Cola de procesos terminados");
+            Cpu cpu = new Cpu(quantumSize, llegadaP, finished_q);
 
             llegadaP.start();
             cpu.start();
@@ -55,7 +64,7 @@ public class P1RRalgoritmOS {
                 cpu.join();
             } catch (InterruptedException ex) {
             } 
-            colaProcesosTerminados.imprimirDatosFinales();
+            finished_q.imprimirDatosFinales();
             System.out.println("\n\n\t\tFin de ejecucion");
 
         } else{
@@ -75,7 +84,7 @@ public class P1RRalgoritmOS {
         System.out.println("Profesora: Ing. Patricia Del Valle Morales");
         System.out.println("Alumnos:");
         System.out.println("Mejia Alba Israel Hipolito");
-        System.out.println("Zuñiga Salgado Luis Eduardo ");
+        System.out.println("ZuÃ±iga Salgado Luis Eduardo ");
     }
 
     public static int[] definicionParametros(){
@@ -99,13 +108,13 @@ public class P1RRalgoritmOS {
         Scanner scan = new Scanner(System.in);
         for (int i = 0; i < nProcess; i++) { //ciclo que solicita datos y guarda los procesos en procesosDesordenados
             indiceNormal = i + 1; 
-            System.out.println("\n\t¿Cual es el Nombre del proceso "+i + " ? ");
+            System.out.println("\n\t ¿Cual es el Nombre del proceso "+i + " ? ");
             processName = scan.next();
-            System.out.println("¿Cuanta memoria ocupara el proceso " + processName + " en [kb]? ");
+            System.out.println(" ¿Cuanta memoria ocupara el proceso " + processName + " en [kb]? ");
             processMsize = scan.nextInt(); 
-            System.out.println("¿Cual es el tiempo de llegada del proceso " + processName + " en [ms]? ");
+            System.out.println(" ¿Cual es el tiempo de llegada del proceso " + processName + " en [ms]? ");
             horaLlegada = scan.nextInt();
-            System.out.println("¿Cual es el tiempo de servicio del proceso " + processName + " en [ms]? ");
+            System.out.println(" ¿Cual es el tiempo de servicio del proceso " + processName + " en [ms]? ");
             tiempoEjecucion = scan.nextInt();   
                     
             
@@ -125,13 +134,15 @@ public class P1RRalgoritmOS {
     public static Proceso[] ordenarProcesos(Proceso[] procesosDesordenados) {
         for (int x = 0; x < procesosDesordenados.length; x++) {
             for (int i = 0; i < procesosDesordenados.length - x - 1; i++) {
-                Proceso tmp = procesosDesordenados[i].tiempoLlegada > procesosDesordenados[i + 1].tiempoLlegada ? procesosDesordenados[i + 1] : procesosDesordenados[i];
-                procesosDesordenados[i + 1] = procesosDesordenados[i] == tmp ? procesosDesordenados[i + 1] : procesosDesordenados[i + 1];
-                procesosDesordenados[i] = procesosDesordenados[i] == tmp ? procesosDesordenados[i] : tmp;
+                
+                if (procesosDesordenados[i].tiempoLlegada > procesosDesordenados[i + 1].tiempoLlegada) {
+                    Proceso tmp = procesosDesordenados[i + 1];
+                    procesosDesordenados[i + 1] = procesosDesordenados[i];
+                    procesosDesordenados[i] = tmp;
+                }
             }
         }
         return procesosDesordenados;
     }
-
     
 }
